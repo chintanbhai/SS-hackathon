@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About - Django Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: #0056b3;
+        }
+        .content {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>About Us</h1>
+        
+        <div class="nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'api_home' %}">API</a>
+        </div>
+        
+        <div class="content">
+            <h2>About Our Application</h2>
+            <p>This is a Django web application built with modern web development practices. Our application provides a solid foundation for building scalable web applications.</p>
+            
+            <h3>Features</h3>
+            <ul>
+                <li>Clean and responsive design</li>
+                <li>Well-organized URL structure</li>
+                <li>Modular code architecture</li>
+                <li>RESTful API endpoints</li>
+            </ul>
+            
+            <h3>Technology Stack</h3>
+            <ul>
+                <li>Django - Web framework</li>
+                <li>Python - Programming language</li>
+                <li>HTML/CSS - Frontend styling</li>
+                <li>SQLite - Database (default)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 
