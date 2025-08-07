@@ -1,18 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 import json
 import google.generativeai as genai
 import os
 from .models import Product, Consumer, Order
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+from django import forms
 
 # Configure Gemini API
 genai.configure(api_key=os.getenv('GEMINI_API_KEY', 'your-api-key-here'))
 
 # Create your views here.
 
-def home(request):
+def index(request):
     return render(request, 'index.html')
 
 def chatbot(request):
@@ -126,3 +131,109 @@ def place_order(request, pk):
     if request.method == 'POST':
         return redirect('product_detail', pk=product.pk)
     return JsonResponse({'status': 'success', 'order_id': order.id})
+
+@login_required
+def consumer_dashboard(request):
+    # Example: show recent orders and available products
+    consumer = None
+    orders = []
+    if request.user.is_authenticated and hasattr(request.user, 'consumer'):
+        consumer = request.user.consumer
+        orders = Order.objects.filter(consumer=consumer).order_by('-order_date')[:5]
+    products = Product.objects.all()[:6]
+    return render(request, 'consumer/dashboard.html', {
+        'consumer': consumer,
+        'orders': orders,
+        'products': products,
+    })
+
+class ConsumerSignUpForm(forms.ModelForm):
+    username = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput)
+    class Meta:
+        model = Consumer
+        fields = ['name', 'email', 'address', 'phone']
+
+    def save(self, commit=True):
+        user = User.objects.create_user(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            password=self.cleaned_data['password']
+        )
+        consumer = super().save(commit=False)
+        consumer.user = user
+        if commit:
+            consumer.save()
+        return consumer
+
+def consumer_signup(request):
+    if request.method == 'POST':
+        form = ConsumerSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('consumer_signin')
+    else:
+        form = ConsumerSignUpForm()
+    return render(request, 'consumer/signup.html', {'form': form})
+
+def consumer_signin(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('product_list')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'consumer/signin.html', {'form': form})
+
+def consumer_logout(request):
+    logout(request)
+    return redirect('index')
+
+def get_cart(request):
+    return request.session.setdefault('cart', {})
+
+def save_cart(request, cart):
+    request.session['cart'] = cart
+    request.session.modified = True
+
+def cart_view(request):
+    cart = get_cart(request)
+    product_ids = cart.keys()
+    products = Product.objects.filter(id__in=product_ids)
+    cart_items = []
+    total = 0
+    for product in products:
+        quantity = cart[str(product.id)]
+        subtotal = product.price * quantity
+        total += subtotal
+        cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
+    return render(request, 'consumer/cart.html', {'cart_items': cart_items, 'total': total})
+
+@require_POST
+def add_to_cart(request, pk):
+    cart = get_cart(request)
+    quantity = int(request.POST.get('quantity', 1))
+    cart[str(pk)] = cart.get(str(pk), 0) + quantity
+    save_cart(request, cart)
+    return redirect('cart_view')
+
+@require_POST
+def remove_from_cart(request, pk):
+    cart = get_cart(request)
+    if str(pk) in cart:
+        del cart[str(pk)]
+        save_cart(request, cart)
+    return redirect('cart_view')
+
+@require_POST
+def update_cart_quantity(request, pk):
+    cart = get_cart(request)
+    quantity = int(request.POST.get('quantity', 1))
+    if quantity > 0:
+        cart[str(pk)] = quantity
+    else:
+        cart.pop(str(pk), None)
+    save_cart(request, cart)
+    return redirect('cart_view')

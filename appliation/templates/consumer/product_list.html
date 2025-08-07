@@ -7,6 +7,9 @@
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
         .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
         h1 { color: #2c5530; text-align: center; }
+        .cart-link { text-align: right; margin-bottom: 18px; }
+        .cart-link a { color: #4CAF50; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
+        .cart-link a:hover { text-decoration: underline; }
         .search-bar { text-align: center; margin-bottom: 30px; }
         .search-bar input[type="text"] { width: 300px; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
         .search-bar button { padding: 8px 16px; border-radius: 4px; border: none; background: #4CAF50; color: #fff; cursor: pointer; }
@@ -18,10 +21,42 @@
         .product-card .price { color: #388e3c; font-weight: bold; margin: 8px 0; }
         .product-card a { display: inline-block; margin-top: 10px; padding: 6px 14px; background: #4CAF50; color: #fff; border-radius: 4px; text-decoration: none; }
         .product-card a:hover { background: #357a38; }
+        .add-cart-form { margin-top: 10px; }
+        .add-cart-form input[type='number'] { width: 60px; padding: 5px; border-radius: 4px; border: 1px solid #ccc; margin-right: 6px; }
+        .add-cart-form button { padding: 6px 12px; border-radius: 4px; border: none; background: #388e3c; color: #fff; cursor: pointer; }
+        .add-cart-form button:hover { background: #2c5530; }
+        .logout-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            background: #e53935;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+        .header-bar { position: relative; min-height: 60px; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="header-bar">
+            <div class="cart-link" style="float:left;">
+                <a href="{% url 'cart_view' %}">🛒 View Cart</a>
+            </div>
+            <form method="post" action="{% url 'consumer_logout' %}" style="float:right;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+            <div style="clear:both;"></div>
+        </div>
         <h1>Browse Products</h1>
         <div class="search-bar">
             <form method="get">
@@ -41,6 +76,11 @@
                 <p>{{ product.description|truncatechars:60 }}</p>
                 <div class="price">₹{{ product.price }}</div>
                 <a href="{% url 'product_detail' product.pk %}">View Details</a>
+                <form class="add-cart-form" method="post" action="{% url 'add_to_cart' product.pk %}">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                    <button type="submit">Add to Cart</button>
+                </form>
             </div>
             {% empty %}
             <p>No products found.</p>

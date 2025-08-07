@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consumer Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f8f3; margin: 0; }
+        .signup-container { max-width: 400px; margin: 60px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(44,85,48,0.08); padding: 36px 28px; }
+        h1 { color: #2c5530; text-align: center; margin-bottom: 24px; }
+        form label { color: #2c5530; font-weight: 500; }
+        form input, form textarea { width: 100%; padding: 9px; margin-bottom: 16px; border-radius: 5px; border: 1px solid #bdbdbd; font-size: 1rem; }
+        button { width: 100%; background: #4CAF50; color: #fff; border: none; padding: 12px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #357a38; }
+        .signin-link { text-align: center; margin-top: 18px; }
+        .signin-link a { color: #388e3c; text-decoration: none; }
+        .signin-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h1>Sign Up</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Create Account</button>
+        </form>
+        <div class="signin-link">
+            Already have an account? <a href="{% url 'consumer_signin' %}">Sign In</a>
+        </div>
+    </div>
+</body>
+</html>
