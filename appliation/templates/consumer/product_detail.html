@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - Product Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .product-img { text-align: center; }
+        .product-img img { max-width: 300px; height: 200px; object-fit: contain; border-radius: 8px; background: #fafafa; }
+        h1 { color: #2c5530; margin-bottom: 10px; }
+        .desc { color: #555; margin-bottom: 20px; }
+        .price { color: #388e3c; font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+        .order-form { background: #f9f9f9; padding: 18px; border-radius: 8px; margin-top: 30px; }
+        .order-form label { display: block; margin-bottom: 6px; color: #2c5530; }
+        .order-form input, .order-form select { width: 100%; padding: 8px; margin-bottom: 14px; border-radius: 4px; border: 1px solid #ccc; }
+        .order-form button { background: #4CAF50; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        .order-form button:hover { background: #357a38; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-img">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image">
+            {% endif %}
+        </div>
+        <h1>{{ product.name }}</h1>
+        <div class="desc">{{ product.description }}</div>
+        <div class="price">₹{{ product.price }}</div>
+        <div>Stock: {{ product.stock }}</div>
+        <div class="order-form">
+            <h2>Place Order</h2>
+            <form method="post" action="{% url 'place_order' product.pk %}">
+                {% csrf_token %}
+                <label for="consumer_id">Consumer ID:</label>
+                <input type="number" name="consumer_id" id="consumer_id" required>
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" required>
+                <label for="order_type">Order Type:</label>
+                <select name="order_type" id="order_type">
+                    <option value="one_time">One-Time</option>
+                    <option value="subscription">Subscription</option>
+                </select>
+                <button type="submit">Place Order</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

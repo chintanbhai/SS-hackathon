@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Products</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        h1 { color: #2c5530; text-align: center; }
+        .search-bar { text-align: center; margin-bottom: 30px; }
+        .search-bar input[type="text"] { width: 300px; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        .search-bar button { padding: 8px 16px; border-radius: 4px; border: none; background: #4CAF50; color: #fff; cursor: pointer; }
+        .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .product-card { background: #fafafa; border-radius: 8px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); text-align: center; }
+        .product-card img { max-width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px; }
+        .product-card h3 { margin: 10px 0 5px; color: #2c5530; }
+        .product-card p { color: #555; font-size: 15px; }
+        .product-card .price { color: #388e3c; font-weight: bold; margin: 8px 0; }
+        .product-card a { display: inline-block; margin-top: 10px; padding: 6px 14px; background: #4CAF50; color: #fff; border-radius: 4px; text-decoration: none; }
+        .product-card a:hover { background: #357a38; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Browse Products</h1>
+        <div class="search-bar">
+            <form method="get">
+                <input type="text" name="q" placeholder="Search products..." value="{{ query }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <div class="product-list">
+            {% for product in products %}
+            <div class="product-card">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/150x120?text=No+Image" alt="No Image">
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description|truncatechars:60 }}</p>
+                <div class="price">₹{{ product.price }}</div>
+                <a href="{% url 'product_detail' product.pk %}">View Details</a>
+            </div>
+            {% empty %}
+            <p>No products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
