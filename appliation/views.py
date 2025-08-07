@@ -95,7 +95,3 @@ def about(request):
 def contact(request):
     """Contact page view"""
     return render(request, 'contact.html')
-
-def test_page(request):
-    """Test page for chatbot examples"""
-    return render(request, 'test.html')

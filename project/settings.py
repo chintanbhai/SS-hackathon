@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'appliation',  # Replace with your actual application name
+    'farmer',
 ]
 
 MIDDLEWARE = [
